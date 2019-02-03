@@ -3,12 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var dgram_1 = require("dgram");
 var index_1 = require("../model/index");
 var DiscoveryService = /** @class */ (function () {
-    function DiscoveryService() {
+    function DiscoveryService(ip) {
+        var _this = this;
         this.multicastAddress = "239.255.255.250";
         this.multicastPort = 1982;
         this.retryTimer = 10;
         this.socket = dgram_1.createSocket({ type: "udp4", reuseAddr: true });
-        this.socket.bind(this.multicastPort);
+        this.socket.bind(this.multicastPort, function () {
+            _this.socket.setMulticastInterface(ip);
+        });
         this.registerResponseHandler();
     }
     DiscoveryService.prototype.startDiscovery = function (retryTimer) {

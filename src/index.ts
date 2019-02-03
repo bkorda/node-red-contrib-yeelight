@@ -3,13 +3,7 @@ import { DeviceList, Yeelight } from './model/index'
 import { DiscoveryService } from './service/discovery'
 import { Red } from 'node-red'
 
-let discoverService = new DiscoveryService()
-let devices = new DeviceList()
-
-discoverService.discoveryCallback = (status) => {
-  devices.updateDevicesWithStatus(status)
-}
-discoverService.startDiscovery()
+const os = require('os');
 
 let booleanValueMap: {[s: string]: boolean} = {
   'on': true,
@@ -21,6 +15,23 @@ let booleanValueMap: {[s: string]: boolean} = {
 }
 
 module.exports = function(RED: Red) {
+  const ifaces: {[s: string]: any} = os.networkInterfaces();
+  const devices = new DeviceList()
+  const discoveryServices = []
+  Object.values(ifaces)
+    .reduce((a, b) => a.concat(b), [])
+    .filter(iface => iface.family === 'IPv4' && !iface.internal)
+    .map((iface: any) => iface.address)
+    .forEach((ip: string) => {
+        console.log(`Using ${ip} to discover yeelights`)
+        const discoverService = new DiscoveryService(ip)
+        discoverService.discoveryCallback = (status) => {
+          devices.updateDevicesWithStatus(status)
+        }
+        discoverService.startDiscovery()
+        discoveryServices.push(discoverService)
+    })
+
   function universalNode(config: any) {
     RED.nodes.createNode(this, config)
     const node = this

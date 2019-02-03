@@ -2,12 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var index_1 = require("./model/index");
 var discovery_1 = require("./service/discovery");
-var discoverService = new discovery_1.DiscoveryService();
-var devices = new index_1.DeviceList();
-discoverService.discoveryCallback = function (status) {
-    devices.updateDevicesWithStatus(status);
-};
-discoverService.startDiscovery();
+var os = require('os');
 var booleanValueMap = {
     'on': true,
     'off': false,
@@ -17,6 +12,22 @@ var booleanValueMap = {
     'no': false
 };
 module.exports = function (RED) {
+    var ifaces = os.networkInterfaces();
+    var devices = new index_1.DeviceList();
+    var discoveryServices = [];
+    Object.values(ifaces)
+        .reduce(function (a, b) { return a.concat(b); }, [])
+        .filter(function (iface) { return iface.family === 'IPv4' && !iface.internal; })
+        .map(function (iface) { return iface.address; })
+        .forEach(function (ip) {
+        console.log("Using " + ip + " to discover yeelights");
+        var discoverService = new discovery_1.DiscoveryService(ip);
+        discoverService.discoveryCallback = function (status) {
+            devices.updateDevicesWithStatus(status);
+        };
+        discoverService.startDiscovery();
+        discoveryServices.push(discoverService);
+    });
     function universalNode(config) {
         RED.nodes.createNode(this, config);
         var node = this;

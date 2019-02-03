@@ -10,9 +10,11 @@ class DiscoveryService {
   intervalTimer?: NodeJS.Timeout
   retryTimer = 10
 
-  constructor() {
+  constructor(ip: string) {
     this.socket = createSocket({ type: "udp4", reuseAddr: true })
-    this.socket.bind(this.multicastPort)
+    this.socket.bind(this.multicastPort, () => {
+      this.socket.setMulticastInterface(ip);
+    })
     this.registerResponseHandler()
   }
 
