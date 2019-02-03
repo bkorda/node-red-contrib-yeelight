@@ -72,6 +72,22 @@ var Yeelight = /** @class */ (function () {
             });
         });
     };
+    Yeelight.prototype.toggle = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var power;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        power = !this.info.power;
+                        return [4 /*yield*/, this.setPower(power)];
+                    case 1:
+                        _a.sent();
+                        this.info.power = power;
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     Yeelight.prototype.send = function (packet) {
         var _this = this;
         return new Promise(function (resolve, reject) {

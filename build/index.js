@@ -7,6 +7,7 @@ var devices = new index_1.DeviceList();
 discoverService.discoveryCallback = function (status) {
     devices.updateDevicesWithStatus(status);
 };
+discoverService.startDiscovery();
 var booleanValueMap = {
     'on': true,
     'off': false,
@@ -42,7 +43,7 @@ module.exports = function (RED) {
                     msg.payload = 'success';
                 }
                 else if (payload === 'toggle') {
-                    device.setPower(!device.info.power);
+                    device.toggle();
                 }
             }
             node.send(msg);
@@ -50,6 +51,7 @@ module.exports = function (RED) {
     }
     RED.nodes.registerType("yeelight-local", universalNode);
     RED.httpAdmin.get('/yeelight-local/devices', function (req, res) {
+        console.log(devices.yeelights);
         res.send(devices.yeelights);
     });
 };

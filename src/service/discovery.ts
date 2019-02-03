@@ -16,7 +16,7 @@ class DiscoveryService {
     this.registerResponseHandler()
   }
 
-  startDiscovery(retryTimer: any) {
+  startDiscovery(retryTimer?: number) {
     retryTimer = retryTimer || 10
     try {
       this.initDiscoveryWithRetry()

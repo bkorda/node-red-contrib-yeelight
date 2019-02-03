@@ -1,4 +1,5 @@
 import { Address, YeelightStatus } from './index'
+
 import { Socket } from 'net'
 
 class Yeelight {
@@ -35,6 +36,12 @@ class Yeelight {
     }
 
     return this.send(packet)
+  }
+
+  async toggle() {
+    const power = !this.info.power
+    await this.setPower(power)
+    this.info.power = power
   }
 
   send(packet) {

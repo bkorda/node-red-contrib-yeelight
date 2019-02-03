@@ -9,6 +9,7 @@ let devices = new DeviceList()
 discoverService.discoveryCallback = (status) => {
   devices.updateDevicesWithStatus(status)
 }
+discoverService.startDiscovery()
 
 let booleanValueMap: {[s: string]: boolean} = {
   'on': true,
@@ -45,7 +46,7 @@ module.exports = function(RED: Red) {
           device.setPower(booleanPayload)
           msg.payload = 'success'
         } else if (payload === 'toggle') {
-          device.setPower(!device.info.power)
+          device.toggle()
         }
       }
       node.send(msg);
@@ -55,6 +56,7 @@ module.exports = function(RED: Red) {
   RED.nodes.registerType("yeelight-local", universalNode);
 
   RED.httpAdmin.get('/yeelight-local/devices', (req: any, res: any) => {
+    console.log(devices.yeelights)
     res.send(devices.yeelights)
   })
 }
