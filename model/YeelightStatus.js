@@ -17,6 +17,8 @@ var YeelightStatus = /** @class */ (function () {
         this.power = fields['power'] === 'on';
         this.hue = parseInt(fields['hue'], 10);
         this.sat = parseInt(fields['sat'], 10);
+        this.bright = parseInt(fields['bright'], 10);
+        this.ct = parseInt(fields['ct'], 10);
         this.color = '#' + parseInt(fields['color'], 10).toString(16);
         this.id = fields['id'];
     }

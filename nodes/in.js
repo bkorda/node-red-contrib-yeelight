@@ -44,6 +44,8 @@ module.exports = function (RED) {
             return status1.power === status2.power &&
             status1.hue === status2.hue &&
             status1.sat === status2.sat &&
+            status1.bright === status2.bright &&
+            status1.ct === status2.ct &&
             status1.color === status2.color
         }
 
@@ -52,6 +54,8 @@ module.exports = function (RED) {
                 "power" : status.power,
                 "hue" : status.hue,
                 "sat" : status.sat,
+                "bright" : status.bright,
+                "ct" : status.ct,
                 "color" : status.color
             }
         }

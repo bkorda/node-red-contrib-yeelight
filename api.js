@@ -39,4 +39,15 @@ module.exports = function (RED) {
         console.log(devices.yeelights);
         res.send(devices.yeelights);
     });
+
+    /**
+     * Enable http route to static files
+     */
+    RED.httpAdmin.get(NODE_PATH + 'static/*', function (req, res) {
+        var options = {
+            root: __dirname + '/static/',
+            dotfiles: 'deny'
+        };
+        res.sendFile(req.params[0], options);
+    });
 }

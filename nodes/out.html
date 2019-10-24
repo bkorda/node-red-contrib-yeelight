@@ -75,7 +75,7 @@
       var node = this;
 
       $('#devices-reload').click(() => {
-        fetchDevices(this);
+        fillDeviceSelector(node.device, '#node-input-device');
       })
 
       var topicTypes = {
@@ -85,8 +85,9 @@
                 options: [
                     {'value':'on', 'label':'Switch (true/false)'},
                     {'value':'toggle', 'label':'Toggle'},
-                    {'value':'brightness', 'label':'Brightness(0...255)'},
-                    {'value':'rgb', 'label':'RGB("rrr,ggg,bbb")'}
+                    {'value':'brightness', 'label':'Brightness(0...100)'},
+                    {'value':'hue', 'label':'Hue(0...359)'},
+                    {'value':'sat', 'label':'Saturation(0...100)'}
                 ]
             };
 
@@ -126,7 +127,7 @@
             $('#node-input-commandType').val(node.commandType);
 
 
-      fetchDevices(this)      
+      fillDeviceSelector(node.device, '#node-input-device');
     },
     oneditsave: function () {
       if ($('#node-input-device').attr('disabled')) {
@@ -134,35 +135,6 @@
       }
     }
   });
-
-  function optionForDevice(device, context) {
-    console.log(device)
-    const selected = (context.device && context.device.info && device.info.id == context.device.info.id) ? 'selected' :
-      '';
-    return `<option value='${device.info.id}' ${selected}>${device.address.ip} - ${device.info.name} - ${device.info.id}</option>`
-  }
-
-  function fetchDevices(context) {
-    $.get('yeelight/devices', (fetchedDevices) => {
-      if (fetchedDevices.error) {
-        console.log(fetchedDevices.error)
-        return;
-      }
-
-      let devices = {}
-      fetchedDevices.forEach((device) => {
-        devices[device.info.id] = device
-      })
-
-      if (fetchedDevices.length > 0) {
-        let html = fetchedDevices
-          .map(device => optionForDevice(device, context))
-          .reduce((a, b) => a + b)
-        $('#node-input-device').html(html);
-        $('#node-input-device').removeAttr('disabled')
-      }
-    }, 'json')
-  }
 </script>
 
 <script type="text/x-red" data-help-name="yeelight-out">

@@ -12,7 +12,6 @@ var booleanValueMap = {
     'no': false
 };
 
-var index_1 = require("../model/index");
 var helper = require("../static/yeelight-helper");
 
 module.exports = function (RED) {
@@ -24,7 +23,7 @@ module.exports = function (RED) {
             node.command = config.command;
             node.payloadType = config.payloadType;
             node.commandType = config.commandType;
-            
+
             var deviceId = config.device;
             var devices = helper.getDeviceList()
 
@@ -103,6 +102,28 @@ module.exports = function (RED) {
                                 }
                                 break;
 
+                            case 'hue':
+                                var hue = parseInt(payload);
+                                node.context().global.set("nrcy-hue", hue);
+                                var sat = device.info.sat;
+                                if (node.context().global.get("nrcy-sat") !== undefined) {
+                                    sat = node.context().global.get("nrcy-sat");
+                                }
+
+                                device.setHSV(hue, sat, "smooth", 500);
+                                break;
+
+                            case 'sat':
+                                var sat = parseInt(payload);
+                                node.context().global.set("nrcy-sat", sat);
+                                var hue = device.info.hue;
+                                if (node.context().global.get("nrcy-hue") !== undefined) {
+                                    hue = node.context().global.get("nrcy-hue");
+                                }
+
+                                device.setHSV(hue, sat, "smooth", 500);
+                                break;
+
                             case 'rgb':
                                 var values = payload.split(',');
                                 device.setRGB(parseInt(values[0]), parseInt(values[1]), parseInt(values[2]), "smooth", 500);
@@ -114,7 +135,7 @@ module.exports = function (RED) {
                         break;
 
                     case 'homekit':
-                        node.formatHomeKit(message, device);
+                        node.formatHomeKit(message, payload, device, node);
                         break;
 
                     case 'str':
@@ -126,20 +147,36 @@ module.exports = function (RED) {
             });
         }
 
-        formatHomeKit(message, device) {
+        formatHomeKit(message, payload, device, node) {
             if (message.hap.context === undefined) {
                 return null;
             }
 
-            var node = this;
-            // var deviceMeta = node.server.getDevice(node.config.device);
-            var command;
             if (payload.On !== undefined) {
                 device.setPower(payload.On);
             } else if (payload.Brightness !== undefined) {
                 device.setBrightness(payload.Brightness);
+            } else if (payload.Hue !== undefined) {
+                node.context().global.set("nrcy-hue", payload.Hue);
+                var sat = device.info.sat;
+                if (node.context().global.get("nrcy-sat") !== undefined) {
+                    sat = node.context().global.get("nrcy-sat");
+                }
+                device.setPower(true).then(function () {
+                    return device.setHSV(payload.Hue, sat, "smooth", 500);
+                });
+            } else if (payload.Saturation !== undefined) {
+                node.context().global.set("nrcy-sat", payload.Saturation);
+                var hue = device.info.hue;
+                if (node.context().global.get("nrcy-hue") !== undefined) {
+                    hue = node.context().global.get("nrcy-hue");
+                }
+                device.setPower(true).then(function () {
+                    return device.setHSV(hue, payload.Saturation, "smooth", 500);
+                });
             }
         }
+
     }
 
     RED.nodes.registerType("yeelight-out", YeelightOut);

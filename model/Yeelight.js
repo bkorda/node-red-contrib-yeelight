@@ -109,6 +109,20 @@ var Yeelight = /** @class */ (function () {
         });
     };
 
+    Yeelight.prototype.setHSV = function (hue, sat, effect, duration) {
+        return __awaiter(this, void 0, void 0, function () {
+            var packet;
+            return __generator(this, function (_a) {
+                packet = {
+                    id: Math.round(Math.random() * 1000000),
+                    method: 'set_hsv',
+                    params: [hue, sat, effect, duration]
+                };
+                return [2 /*return*/, this.send(packet)];
+            });
+        });
+    };
+
     Yeelight.prototype.send = function (packet) {
         var _this = this;
         return new Promise(function (resolve, reject) {
