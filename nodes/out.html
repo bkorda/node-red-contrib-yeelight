@@ -1,0 +1,170 @@
+<script type="text/x-red" data-template-name="yeelight-out">
+  <div class="form-row">
+    <label for="node-input-name" class="l-width"><i class="icon-tag"></i><span data-i18n="label.name"></span></label>
+    <input type="text" id="node-input-name" data-i18n="[placeholder]placeholder.name">
+  </div>
+  <div class='form-row'>
+    <label for='node-input-device'><i class='fa fa-lightbulb-o'></i> <span data-i18n="label.device"></label>
+    <select type='text' id='node-input-device' style='display: inline-block; vertical-align: middle; width:60%;'>
+    </select>
+    <button id='devices-reload'>reload</button>
+  </div>
+  <div class="form-row">
+    <label for="node-input-command" class="l-width"><i class="fa fa-tasks"></i> <span data-i18n="label.command"></span></label>
+    <input type="text" id="node-input-command" style="width:70%">
+    <input type="hidden" id="node-input-commandType">
+  </div>
+  <div class="form-row">
+      <label for="node-input-payload" class="l-width"><i class="fa fa-envelope"></i> <span data-i18n="label.payload"></span></label>
+      <input type="text" id="node-input-payload" style="width:70%">
+      <input type="hidden" id="node-input-payloadType">
+  </div>
+</script>
+
+<style type="text/css">
+  .node_label_white {
+    fill: white;
+  }
+
+  .node_label_white_italic {
+    fill: white;
+    font-style: italic;
+  }
+
+  #palette_node_yeelight-out>div.palette_label {
+    color: white;
+  }
+</style>
+
+<script type="text/javascript">
+  RED.nodes.registerType('yeelight-out', {
+    category: 'light',
+    color: '#BA1F1F',
+    align: 'right',
+    defaults: {
+      name: {
+        value: ""
+      },
+      device: {
+        required: true
+      },
+      command: {
+        value: 'on',
+      },
+      commandType: {
+        value: 'yeelight_cmd',
+      },
+      payload: {
+        value: 'payload',
+      },
+      payloadType: {
+        value: 'msg',
+      },
+    },
+    inputs: 1,
+    outputs: 0,
+    inputLabels: "event",
+    icon: "yeelight.png",
+    label: function () {
+      return this.name || "yeelight-out";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_white_italic" : "node_label_white";
+    },
+    oneditprepare: function () {
+      var node = this;
+
+      $('#devices-reload').click(() => {
+        fetchDevices(this);
+      })
+
+      var topicTypes = {
+                value: 'yeelight_cmd',
+                label: 'Yeelight',
+                icon: 'icons/node-red-contrib-yeelight/yeelight-logo.png',
+                options: [
+                    {'value':'on', 'label':'Switch (true/false)'},
+                    {'value':'toggle', 'label':'Toggle'},
+                    {'value':'brightness', 'label':'Brightness(0...255)'},
+                    {'value':'rgb', 'label':'RGB("rrr,ggg,bbb")'}
+                ]
+            };
+
+            $('#node-input-command').typedInput({
+                types: [topicTypes, {value:'homekit',label:'homekit',icon: 'icons/node-red-contrib-yeelight/homekit-logo.png',options:['homekit']}, 'str', 'msg'],
+                default: 'msg',
+                value: 'topic',
+                typeField: $('#node-input-commandType'),
+            });
+
+            $('#node-input-command').on('change', function(type, value) {
+                var val = $(this).val();
+                if ('toggle' === val) {
+                    $('#node-input-payload').closest('.form-row').hide();
+                } else {
+                    $('#node-input-payload').closest('.form-row').show();
+                }
+            });
+
+            var payloadTypes = {
+                value: 'yeelight_payload',
+                label: 'Yeelight',
+                icon: 'icons/node-red-contrib-yeelight/yeelight-logo.png',
+                options: [
+                    {'value':'on', 'label':'On (Switch)'},
+                    {'value':'off', 'label':'Off (Switch)'}
+                ]
+            };
+            $('#node-input-payload').typedInput({
+                types: [payloadTypes, 'msg', 'flow', 'global', 'str', 'num'],
+                default: 'msg',
+                value: 'payload',
+                typeField: $('#node-input-payloadType'),
+            });
+
+            $('#node-input-payloadType').val(node.payloadType);
+            $('#node-input-commandType').val(node.commandType);
+
+
+      fetchDevices(this)      
+    },
+    oneditsave: function () {
+      if ($('#node-input-device').attr('disabled')) {
+        this.device = undefined
+      }
+    }
+  });
+
+  function optionForDevice(device, context) {
+    console.log(device)
+    const selected = (context.device && context.device.info && device.info.id == context.device.info.id) ? 'selected' :
+      '';
+    return `<option value='${device.info.id}' ${selected}>${device.address.ip} - ${device.info.name} - ${device.info.id}</option>`
+  }
+
+  function fetchDevices(context) {
+    $.get('yeelight/devices', (fetchedDevices) => {
+      if (fetchedDevices.error) {
+        console.log(fetchedDevices.error)
+        return;
+      }
+
+      let devices = {}
+      fetchedDevices.forEach((device) => {
+        devices[device.info.id] = device
+      })
+
+      if (fetchedDevices.length > 0) {
+        let html = fetchedDevices
+          .map(device => optionForDevice(device, context))
+          .reduce((a, b) => a + b)
+        $('#node-input-device').html(html);
+        $('#node-input-device').removeAttr('disabled')
+      }
+    }, 'json')
+  }
+</script>
+
+<script type="text/x-red" data-help-name="yeelight-out">
+  <p>Node helps to communicate with Yeelight wifi devices</p>
+</script>

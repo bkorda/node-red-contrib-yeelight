@@ -1,0 +1,29 @@
+{
+  "author": {
+    "name": "Bohdan Korda",
+    "email": "b.korda@hotmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/bkorda/node-red-contrib-yeeligh/issues/"
+  },
+  "name": "node-red-contrib-yeelight",
+  "description": "Yeelight light local control",
+  "homepage": "https://github.com/bkorda/node-red-contrib-yeelight",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "node-ssdp": "^4.0.0",
+    "ts-node": "^7.0.1"
+  },
+  "node-red": {
+    "nodes": {
+      "yeelight-in": "nodes/in.js",
+      "yeelight-out": "nodes/out.js",
+      "api": "api.js"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bkorda/node-red-contrib-yeelight.git"
+  },
+  "version": "1.0.0"
+}
