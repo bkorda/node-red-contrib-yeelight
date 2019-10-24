@@ -1,0 +1,70 @@
+<script type="text/x-red" data-template-name="yeelight-get">
+  <div class="form-row">
+    <label for="node-input-name" class="l-width"><i class="icon-tag"></i><span data-i18n="label.name"></span></label>
+    <input type="text" id="node-input-name" data-i18n="[placeholder]placeholder.name">
+  </div>
+  <div class='form-row'>
+    <label for='node-input-device'><i class='fa fa-lightbulb-o'></i> <span data-i18n="label.device"></label>
+    <select type='text' id='node-input-device' style='display: inline-block; vertical-align: middle; width:60%;'>
+    </select>
+    <button id='devices-reload'>reload</button>
+  </div>
+</script>
+
+<style type="text/css">
+  .node_label_white {
+      fill: white;
+  }
+  .node_label_white_italic {
+      fill: white;
+      font-style: italic;
+  }
+  #palette_node_yeelight-in > div.palette_label {
+      color: white;
+  }
+  </style>
+
+<script type="text/javascript">
+  RED.nodes.registerType('yeelight-get', {
+    category: 'light',
+    color: '#BA1F1F',
+    defaults: {
+      name: {
+        value: ""
+      },
+      device: {
+        required: true
+      }
+    },
+    inputs: 1,
+    outputs: 1,
+    outputLabels: ["state"],
+    icon: "yeelight.png",
+    label: function () {
+      return this.name || "yeelight-get";
+    },
+    labelStyle: function () {
+      return this.name ? "node_label_white_italic" : "node_label_white";
+    },
+    oneditprepare: function () {
+      var node = this;
+
+      $('#devices-reload').click(() => {
+        fillDeviceSelector(node.device, '#node-input-device');
+      })
+
+      fillDeviceSelector(node.device, '#node-input-device');
+    },
+    oneditsave: function () {
+      if ($('#node-input-device').attr('disabled')) {
+        this.device = undefined
+      }
+    }
+  });
+
+  
+</script>
+
+<script type="text/x-red" data-help-name="yeelight-get">
+  <p>Node helps to communicate with Yeelight wifi devices</p>
+</script>

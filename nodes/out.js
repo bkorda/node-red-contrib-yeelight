@@ -27,7 +27,6 @@ module.exports = function (RED) {
             var deviceId = config.device;
             var devices = helper.getDeviceList()
 
-
             this.on('input', function (message) {
                 var device = devices.deviceById(deviceId);
                 if (!device) {

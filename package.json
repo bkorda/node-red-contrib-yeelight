@@ -18,6 +18,7 @@
     "nodes": {
       "yeelight-in": "nodes/in.js",
       "yeelight-out": "nodes/out.js",
+      "yeelight-get": "nodes/get.js",
       "api": "api.js"
     }
   },
