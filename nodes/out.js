@@ -23,7 +23,7 @@ module.exports = function (RED) {
             node.command = config.command;
             node.payloadType = config.payloadType;
             node.commandType = config.commandType;
-
+            
             var deviceId = config.device;
             var devices = helper.getDeviceList()
 
@@ -36,6 +36,14 @@ module.exports = function (RED) {
                         text: "node-red-contrib-yelight/out:status.device_not_set"
                     });
                     return;
+                }
+
+                if (node.hue === undefined) {
+                    node.hue = device.info.hue;
+                }
+    
+                if (node.sat === undefined) {
+                    node.sat = device.info.sat;
                 }
 
                 var payload;
@@ -103,23 +111,15 @@ module.exports = function (RED) {
 
                             case 'hue':
                                 var hue = parseInt(payload);
-                                node.context().global.set("nrcy-hue", hue);
-                                var sat = device.info.sat;
-                                if (node.context().global.get("nrcy-sat") !== undefined) {
-                                    sat = node.context().global.get("nrcy-sat");
-                                }
-
+                                node.hue = hue;
+                                var sat = node.sat;
                                 device.setHSV(hue, sat, "smooth", 500);
                                 break;
 
                             case 'sat':
                                 var sat = parseInt(payload);
-                                node.context().global.set("nrcy-sat", sat);
-                                var hue = device.info.hue;
-                                if (node.context().global.get("nrcy-hue") !== undefined) {
-                                    hue = node.context().global.get("nrcy-hue");
-                                }
-
+                                node.sat = sat;
+                                var hue = node.hue;
                                 device.setHSV(hue, sat, "smooth", 500);
                                 break;
 
@@ -156,22 +156,14 @@ module.exports = function (RED) {
             } else if (payload.Brightness !== undefined) {
                 device.setBrightness(payload.Brightness);
             } else if (payload.Hue !== undefined) {
-                node.context().global.set("nrcy-hue", payload.Hue);
-                var sat = device.info.sat;
-                if (node.context().global.get("nrcy-sat") !== undefined) {
-                    sat = node.context().global.get("nrcy-sat");
-                }
+                node.hue =  payload.Hue;
                 device.setPower(true).then(function () {
-                    return device.setHSV(payload.Hue, sat, "smooth", 500);
+                    return device.setHSV(payload.Hue, node.sat, "smooth", 500);
                 });
             } else if (payload.Saturation !== undefined) {
-                node.context().global.set("nrcy-sat", payload.Saturation);
-                var hue = device.info.hue;
-                if (node.context().global.get("nrcy-hue") !== undefined) {
-                    hue = node.context().global.get("nrcy-hue");
-                }
+                node.sat = payload.Saturation;
                 device.setPower(true).then(function () {
-                    return device.setHSV(hue, payload.Saturation, "smooth", 500);
+                    return device.setHSV(node.hue, payload.Saturation, "smooth", 500);
                 });
             }
         }

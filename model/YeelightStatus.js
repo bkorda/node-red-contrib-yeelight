@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var url_1 = require("url");
-var YeelightStatus = /** @class */ (function () {
-    function YeelightStatus(multicastMessage) {
+
+class YeelightStatus {
+    constructor(multicastMessage) {
         if (!multicastMessage.match(/yeelight/)) {
             throw Error("Not a yeelight status");
         }
@@ -19,9 +20,26 @@ var YeelightStatus = /** @class */ (function () {
         this.sat = parseInt(fields['sat'], 10);
         this.bright = parseInt(fields['bright'], 10);
         this.ct = parseInt(fields['ct'], 10);
+        this.model = fields['model'];
+        this.support = fields['support'];
         this.color = '#' + parseInt(fields['color'], 10).toString(16);
         this.id = fields['id'];
     }
-    return YeelightStatus;
-}());
+
+    toDictionary() {
+        var dictionary = {};
+
+        dictionary.power = this.power;
+        dictionary.bright = this.bright;
+        dictionary.ct = this.ct;
+
+        if (this.model !== "mono") {
+            dictionary.hue = this.hue;
+            dictionary.sat = this.sat;
+        }
+
+        return dictionary;
+    }
+}
+
 exports.default = YeelightStatus;

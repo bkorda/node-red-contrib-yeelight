@@ -24,7 +24,7 @@ module.exports = function (RED) {
                     });
                     return;
                 }
-                message.device = device.info;
+                message.yeelightState = device.info.toDictionary();
                 node.send(message);
             });
         }

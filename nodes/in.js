@@ -22,13 +22,12 @@ module.exports = function (RED) {
             var device = devices.deviceById(deviceId);
             
             if (device !== undefined) {
-                node.device = device;
                 device.stateUpdateCallback = function (status) {
                     if (!node.isStatusAreEquals(node.lastStatus, status)) {
                         node.lastStatus = status;
                         node.send([{
-                                payload: node.formatStatus(status),
-                                device: node.device
+                                payload: status.toDictionary(),
+                                device: device
                             },
                             node.formatHomeKit(device.info)
                         ]);
@@ -48,29 +47,20 @@ module.exports = function (RED) {
             status1.ct === status2.ct &&
             status1.color === status2.color
         }
-
-        formatStatus(status) {
-            return {
-                "power" : status.power,
-                "hue" : status.hue,
-                "sat" : status.sat,
-                "bright" : status.bright,
-                "ct" : status.ct,
-                "color" : status.color
-            }
-        }
-
-        formatHomeKit(state) {
+        
+        formatHomeKit(info) {
             var no_reponse = false;
         
             var msg = {};
 
             var characteristic = {};
-            if (state !== undefined) {
-                characteristic.Brightness = state.bright;
-                characteristic.Hue = state.hue;
-                characteristic.Saturation = state.sat;
-                characteristic.On = state.power;
+            if (info !== undefined) {
+                if (info.model !== "mono") {
+                    characteristic.Hue = info.hue;
+                    characteristic.Saturation = info.sat;
+                }
+                characteristic.Brightness = info.bright;
+                characteristic.On = info.power;
             }
 
             if (Object.keys(characteristic).length === 0) return null; //empty response
