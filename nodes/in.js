@@ -41,11 +41,17 @@ module.exports = function (RED) {
             if (status1 === undefined) return false;
             if (status2 === undefined) return false;
             return status1.power === status2.power &&
+            status1.active_mode === status2.active_mode &&
             status1.hue === status2.hue &&
             status1.sat === status2.sat &&
             status1.bright === status2.bright &&
             status1.ct === status2.ct &&
-            status1.color === status2.color
+            status1.color === status2.color &&
+            status1.bg_power === status2.bg_power &&
+            status1.bg_ct === status2.bg_ct &&
+            status1.bg_bright === status2.bg_bright &&
+            status1.bg_hue === status2.bg_hue &&
+            status1.bg_sat === status2.bg_sat
         }
         
         formatHomeKit(info) {

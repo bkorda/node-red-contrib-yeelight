@@ -30,6 +30,11 @@ class YeelightStatus {
         this.support = fields['support'];
         this.color = '#' + parseInt(fields['color'], 10).toString(16);
         this.id = fields['id'];
+        this.active_mode = fields['active_mode'];
+
+        if ('nl_br' in fields) {
+            this.nl_br = fields['nl_br'];
+        }
 
         if ("bg_power" in fields) {
             this.bg_power = fields['bg_power'];
@@ -50,10 +55,6 @@ class YeelightStatus {
         if ("bg_sat" in fields) {
             this.bg_sat = fields['bg_sat'];
         }
-
-        if ("bg_power" in fields) {
-            this.bg_power = fields['bg_power'];
-        }
     }
 
     toDictionary() {
@@ -69,6 +70,7 @@ class YeelightStatus {
         }
 
         if (this.model == "ceiling") {
+            dictionary.active_mode = this.active_mode;
             dictionary.bg_power = this.bg_power;
             dictionary.bg_ct = this.bg_ct;
             dictionary.bg_bright = this.bg_bright;
