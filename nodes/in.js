@@ -59,6 +59,7 @@ module.exports = function (RED) {
                     characteristic.Hue = info.hue;
                     characteristic.Saturation = info.sat;
                 }
+                characteristic.ColorTemperature = info.ct;
                 characteristic.Brightness = info.bright;
                 characteristic.On = info.power;
             }

@@ -1,2 +1,4 @@
 node_modules
 .vscode
+package-lock.json
+62577.pid
